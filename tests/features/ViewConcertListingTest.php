@@ -14,32 +14,43 @@ class ViewConcertListingTest extends TestCase
     public function user_can_view_a_concert_listing()
     {
         $concert = Concert::create([
-            'title'                 => 'The Red Chord',
-            'subtitle'              => 'with Animosity and Lethargy',
-            'date'                  => Carbon::parse('December 13, 2016 8:00pm'),
-            'ticket_price'          => 3250,
-            'venue'                 => 'The Mosh Pit',
-            'venue_address'         => '123 Example Lane',
-            'city'                  => 'Laraville',
-            'state'                 => 'ON',
-            'zip'                   => '17916',
+            'title'                  => 'The Red Chord',
+            'subtitle'               => 'with Animosity and Lethargy',
+            'date'                   => Carbon::parse('December 13, 2016 8:00pm'),
+            'ticket_price'           => 3250,
+            'venue'                  => 'The Mosh Pit',
+            'venue_address'          => '123 Example Lane',
+            'city'                   => 'Laraville',
+            'state'                  => 'ON',
+            'zip'                    => '17916',
             'additional_information' => 'For tickets, call (555) 555-5555',
+            'published_at'           => Carbon::parse('December 13, 2016 8:00pm'),
         ]);
 
         $this->visit('/concerts/' . $concert->id);
 
-        $this->see('The Red Chord');
-        $this->see('with Animosity and Lethargy');
-        $this->see('December 13, 2016');
-        $this->see('8:00pm');
-        $this->see('32.50');
-        $this->see('The Mosh Pit');
-        $this->see('123 Example Lane');
-        $this->see('Laraville');
-        $this->see('ON');
-        $this->see('17916');
-        $this->see('For tickets, call (555) 555-5555');
+        $this->see('The Red Chord')
+            ->see('with Animosity and Lethargy')
+            ->see('December 13, 2016')
+            ->see('8:00pm')
+            ->see('32.50')
+            ->see('The Mosh Pit')
+            ->see('123 Example Lane')
+            ->see('Laraville')
+            ->see('ON')
+            ->see('17916')
+            ->see('For tickets, call (555) 555-5555');
+    }
 
+    /** @test */
+    public function user_cannot_view_unpublished_concert_listings()
+    {
+        $concert = factory(Concert::class)->create([
+            'published_at' => null,
+        ]);
 
+        $this->get('/concerts' . $concert->id);
+
+        $this->assertResponseStatus(404);
     }
 }
